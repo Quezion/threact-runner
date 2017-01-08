@@ -1,6 +1,6 @@
 (defproject threact-runner "0.1.0-SNAPSHOT"
   :dependencies [[org.clojure/clojure "1.9.0-alpha14"]
-                 [org.clojure/clojurescript "1.9.229"]i
+                 [org.clojure/clojurescript "1.9.229"]
                  [threact "0.1.0-SNAPSHOT"]]
   :plugins [[lein-figwheel "0.5.8"]]
   :clean-targets [:target-path "out"]
