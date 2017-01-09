@@ -6,7 +6,7 @@
   :clean-targets [:target-path "out"]
   :cljsbuild {
               :builds [{:id "dev"
-                        :source-paths ["src"]
+                        :source-paths ["src" "checkouts/threact/src"]
                         :figwheel true
                         :compiler {:main "threact-runner.core"}
                         }]
