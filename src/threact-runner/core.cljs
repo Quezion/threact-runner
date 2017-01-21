@@ -1,16 +1,21 @@
 (ns threact-runner.core
-  (:require [cljs.spec :as spec]
+  (:require [cljs.spec :as s]
             [threact.core :as c]
-            [threact.specs :as t]
-            [threact.element.scene :as sc]
-            [threact.element.camera :as cam]))
+            [threact.element.camera :as cam]
+            [cljsjs.three]))
 
-(defonce app-state (atom {:likes 0}))
-(spec/def ::even? (spec/and integer? even?))
+(defn construct-renderer
+  "Constructs a default THREE WebGLRenderer and returns it."
+  [width height]
+  (let [renderer (js/THREE.WebGLRenderer.)]
+    (.setSize renderer width height)
+    renderer))
 
-(defn test-spec-simple
-  []
-  (spec/conform even? 1000))
+(defn append-renderer-dom
+  "Appends a renderer to a DOM node. Should be refactored to specify DOM node."
+  [renderer3]
+  (.appendChild (.-body js/document) (.-domElement renderer3)))
+
 
 (def camera
   {:position [0 0 0] :rotation [0 0 0] :fov 90})
@@ -18,21 +23,27 @@
 (def renderer
   {:size [250 250]})
 
-(def scene
-  {:camera camera :renderer renderer})
+(def cube-model
+  {:position [0 1 0] :rotation [1 0 0]})
 
-(defn threact-spec-valid?
-  []
-  (spec/valid? ::sc/scene scene))
+(def basic-scene
+  {:camera camera
+   :renderer renderer
+   :models {:cube1 cube-model}})
 
-(defn threact-spec-explain
-  []
-  (spec/explain ::sc/scene scene))
+(defonce app-state
+  (atom {:root-dom-node (.-body js/document)
+         :scene basic-scene}))
 
-(defn a
-  []
-  (c/x-plus-y 2 2))
+(defn print-result
+  [name spec x]
+  (.log js/console (str "=== Spec-Test BEGIN: " name " ==="))
+  (let [valid? (s/valid? spec x)]
+    (.log js/console (str "Valid? : " valid?))
+    (when-not valid? (->> (with-out-str (s/explain spec x))
+                          (.log js/console))))
+  (.log js/console (str "+++ Spec-Test END: " name " +++")))
+  
+(print-result "Basic-Scene" ::c/scene basic-scene)
+;(append-renderer-dom (construct-renderer 400 400))
 
-;(.log js/console (test-spec))
-(.log js/console (threact-spec-valid?))
-(.log js/console (str "Explain result: " (with-out-str (threact-spec-explain))))
